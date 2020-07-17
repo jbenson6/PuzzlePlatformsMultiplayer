@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "MenuSystem/MenuInterface.h"
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PuzzlePlatformsGameInstance.generated.h"
-
 
 /**
  * 
@@ -24,10 +25,13 @@ public:
 	void Host();
 
 	UFUNCTION(Exec)
-	void Join(const FString& Address);
+	void Join(uint32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void LoadMenu();
+
+
+	void RefreshServerList() override;
 
 
 private:
@@ -36,4 +40,16 @@ private:
 	
 	class UMainMenu* MyMenu;
 	
+	void OnCreateSessionComplete(FName SessionName, bool Success);
+
+	void OnDestroySessionComplete(FName SessionName, bool Success);
+
+	void OnFindSessionComplete(bool Success);
+
+	void OnJoinComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	void CreateSession();
+
+	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
 };

@@ -19,6 +19,9 @@ public:
 	void SetMenuInterface(IMenuInterface* MenuInterface);
 	void Setup();
 	void Teardown();
+	UMainMenu(const FObjectInitializer& ObjectInitializer);
+	void SetServerList(TArray<FString> ServerNames);
+	void SelectIndex(uint32 Index);
 
 protected:
 	virtual bool Initialize();
@@ -46,10 +49,10 @@ private:
 	class UWidget* MainMenu;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* IPAddr;
+	class UButton* QuitButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* QuitButton;
+	class UPanelWidget* ServerScrollBox;
 
 	UFUNCTION()
 	void HostServer();
@@ -66,7 +69,11 @@ private:
 	UFUNCTION()
 	void Quit();
 
+	TOptional<uint32> SelectedIndex;
+
 	IMenuInterface* MenuI;
 
 	APlayerController* Controller;
+
+	TSubclassOf<class UUserWidget> ServerRowClass;
 };

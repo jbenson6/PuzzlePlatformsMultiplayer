@@ -3,8 +3,21 @@
 
 #include "MainMenu.h"
 #include "Components\Button.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Components\WidgetSwitcher.h"
 #include "Components\EditableTextBox.h"
+#include "Components\PanelWidget.h"
+#include "ServerRow.h"
+#include "Components\TextBlock.h"
+
+UMainMenu::UMainMenu(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> ServerRowBPClass(TEXT("/Game/MenuSystem/WBP_ServerRow"));
+	if (!ensure(ServerRowBPClass.Class != nullptr)) return;
+
+	ServerRowClass = ServerRowBPClass.Class;
+}
+
 
 
 bool UMainMenu::Initialize()
@@ -26,12 +39,13 @@ bool UMainMenu::Initialize()
 
 	if (!ensure(QuitButton != nullptr)) return false;
 	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::Quit);
+
 	return true;
 }
 
 void UMainMenu::HostServer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hosting Server"));
+	//UE_LOG(LogTemp, Warning, TEXT("Hosting Server"));
 	if (MenuI != nullptr)
 	{
 		MenuI->Host();
@@ -41,10 +55,14 @@ void UMainMenu::HostServer()
 
 void UMainMenu::OpenJoinMenu()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Joining Server"));
+	//UE_LOG(LogTemp, Warning, TEXT("Joining Server"));
 	if (!ensure(MenuSwitcher != nullptr)) return;
 	if (!ensure(JoinMenu != nullptr)) return;
 	MenuSwitcher->SetActiveWidget(JoinMenu);
+	if (MenuI != nullptr)
+	{
+		MenuI->RefreshServerList();
+	}
 
 }
 
@@ -57,13 +75,14 @@ void UMainMenu::OpenMainMenu()
 
 void UMainMenu::JoinServer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Joining Server"));
-	if (!ensure(MenuI != nullptr)) return;
-	if (!ensure(IPAddr != nullptr)) return;
-	if (MenuI != nullptr)
+	if (SelectedIndex.IsSet() && MenuI != nullptr)
 	{
-		MenuI->Join(IPAddr->GetText().ToString());
+		UE_LOG(LogTemp, Warning, TEXT("Selected Index: %d"), SelectedIndex.GetValue());
+		MenuI->Join(SelectedIndex.GetValue());
 	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Selected Index Not Set"));
+	}	
 }
 
 void UMainMenu::SetMenuInterface(IMenuInterface* MenuInterface)
@@ -99,4 +118,33 @@ void UMainMenu::Teardown()
 void UMainMenu::Quit()
 {
 	Controller->ConsoleCommand("quit");
+}
+
+void UMainMenu::SetServerList(TArray<FString> ServerNames)
+{
+	UWorld* World = this->GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	ServerScrollBox->ClearChildren();
+
+	uint32 i = 0;
+	for (const FString& ServerName : ServerNames)
+	{
+		UServerRow* Row = CreateWidget<UServerRow>(World, ServerRowClass);
+		if (!ensure(Row != nullptr)) return;
+
+		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->Setup(this, i);
+		++i;
+
+		ServerScrollBox->AddChild(Row);
+	}
+	
+	
+}
+
+void UMainMenu::SelectIndex(uint32 Index)
+{
+	SelectedIndex = Index;
+
 }
