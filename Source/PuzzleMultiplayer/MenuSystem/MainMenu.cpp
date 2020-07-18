@@ -120,7 +120,7 @@ void UMainMenu::Quit()
 	Controller->ConsoleCommand("quit");
 }
 
-void UMainMenu::SetServerList(TArray<FString> ServerNames)
+void UMainMenu::SetServerList(TArray<FServerData> ServerNames)
 {
 	UWorld* World = this->GetWorld();
 	if (!ensure(World != nullptr)) return;
@@ -128,12 +128,14 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 	ServerScrollBox->ClearChildren();
 
 	uint32 i = 0;
-	for (const FString& ServerName : ServerNames)
+	for (const FServerData& ServerData : ServerNames)
 	{
 		UServerRow* Row = CreateWidget<UServerRow>(World, ServerRowClass);
 		if (!ensure(Row != nullptr)) return;
 
-		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->ServerName->SetText(FText::FromString(ServerData.Name));
+		Row->ServerPlayersText->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayers, ServerData.MaxPlayers)));
+		Row->HostUsername->SetText(FText::FromString(ServerData.HostUsername));
 		Row->Setup(this, i);
 		++i;
 
@@ -146,5 +148,18 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 void UMainMenu::SelectIndex(uint32 Index)
 {
 	SelectedIndex = Index;
+	UpdateChildren();
+}
 
+void UMainMenu::UpdateChildren()
+{
+	
+	for (int32 i = 0; i < ServerScrollBox->GetChildrenCount(); i++)
+	{
+		auto* Row = Cast<UServerRow>(ServerScrollBox->GetChildAt(i));
+		if (Row != nullptr)
+		{
+			Row->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
+		}
+	}
 }

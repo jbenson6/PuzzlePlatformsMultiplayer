@@ -7,6 +7,16 @@
 #include "MenuInterface.h"
 #include "MainMenu.generated.h"
 
+USTRUCT()
+struct FServerData{
+	GENERATED_BODY()
+
+	FString Name;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUsername;
+};
+
 /**
  * 
  */
@@ -20,7 +30,7 @@ public:
 	void Setup();
 	void Teardown();
 	UMainMenu(const FObjectInitializer& ObjectInitializer);
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FServerData> ServerNames);
 	void SelectIndex(uint32 Index);
 
 protected:
@@ -76,4 +86,6 @@ private:
 	APlayerController* Controller;
 
 	TSubclassOf<class UUserWidget> ServerRowClass;
+
+	void UpdateChildren();
 };
