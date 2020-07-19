@@ -22,7 +22,7 @@ public:
 	virtual void Init();
 
 	UFUNCTION(Exec)
-	void Host();
+	void Host(FString ServerName);
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index);
@@ -52,4 +52,6 @@ private:
 
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
+
+	FString DesiredServerName;
 };

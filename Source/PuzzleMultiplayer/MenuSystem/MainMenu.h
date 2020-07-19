@@ -50,10 +50,19 @@ private:
 	class UWidget* JoinMenu;
 
 	UPROPERTY(meta = (BindWidget))
+	class UWidget* HostMenu;
+
+	UPROPERTY(meta = (BindWidget))
 	class UButton* JoinServerButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* CancelButton;
+	class UButton* HostServerButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CancelJoinButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CancelHostButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* MainMenu;
@@ -64,6 +73,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerScrollBox;
 
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* ServerNameText;
+
 	UFUNCTION()
 	void HostServer();
 
@@ -72,6 +84,9 @@ private:
 
 	UFUNCTION()
 	void OpenMainMenu();
+
+	UFUNCTION()
+		void OpenHostMenu();
 
 	UFUNCTION()
 	void JoinServer();
