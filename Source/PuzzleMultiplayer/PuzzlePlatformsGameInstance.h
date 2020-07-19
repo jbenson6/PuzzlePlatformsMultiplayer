@@ -30,6 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LoadMenu();
 
+	void StartSession();
+
 
 	void RefreshServerList() override;
 
